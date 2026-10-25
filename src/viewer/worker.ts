@@ -19,7 +19,13 @@ import { classifyWorldFile, isRollingBackup } from "../core/paths";
 import "../core/type-hints";
 import { formatGuid, parseLevel, parsePlayer } from "../vendor/migrate.js";
 import { decompressSav } from "../vendor/sav.js";
-import { extractWorld, uidOf, type CharacterEntry, type DpsSlot } from "./extract";
+import {
+  extractWorld,
+  relevantLevelWarnings,
+  uidOf,
+  type CharacterEntry,
+  type DpsSlot,
+} from "./extract";
 import { VIEWER_ERRORS, type ViewerInputFile, type ViewerRequest, type ViewerResponse } from "./protocol";
 import { hasCharacters } from "./scan";
 import { gunzip, isGzip, isTar, readTar } from "./tar";
@@ -173,7 +179,7 @@ async function view(dir: string): Promise<ViewerWorld> {
   const ooz = await loadOoz();
   const meta = await readMeta(files);
   const { level } = (await parseLevel(await levelItem.read(), ooz)) as unknown as { level: ParsedLevel };
-  let warnings = level.warnings?.length ?? 0;
+  let warnings = relevantLevelWarnings(level.warnings ?? []);
 
   const playerFiles = new Map<string, Record<string, { value?: unknown }>>();
   const dpsFiles = new Map<string, DpsSlot[]>();

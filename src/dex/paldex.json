@@ -11169,6 +11169,17 @@
       }
     },
     {
+      "code": "Apocalypse",
+      "element": "Dark",
+      "names": {
+        "en": "Apocalypse",
+        "ja": "アポカリプス",
+        "ko": "아포칼립스",
+        "zh-CN": "启示录",
+        "zh-Hant": "啟示錄"
+      }
+    },
+    {
       "code": "AquaJet",
       "element": "Water",
       "names": {
@@ -11862,6 +11873,17 @@
       }
     },
     {
+      "code": "Intimidate",
+      "element": "Neutral",
+      "names": {
+        "en": "Intimidate",
+        "ja": "Intimidate",
+        "ko": "위협",
+        "zh-CN": "恐吓",
+        "zh-Hant": "威嚇"
+      }
+    },
+    {
       "code": "LightningStrike",
       "element": "Electric",
       "names": {
@@ -12409,6 +12431,17 @@
         "ko": "암석 폭발",
         "zh-CN": "岩爆",
         "zh-Hant": "岩爆"
+      }
+    },
+    {
+      "code": "TriSpark",
+      "element": "Electric",
+      "names": {
+        "en": "TriSpark",
+        "ja": "トライスパーク",
+        "ko": "트라이 스파크",
+        "zh-CN": "三相火花",
+        "zh-Hant": "三相火花"
       }
     },
     {
@@ -20576,6 +20609,19 @@
       "elements": [],
       "human": true,
       "icon": "Emote_Tester"
+    },
+    {
+      "code": "Negotiator",
+      "names": {
+        "en": "Negotiator",
+        "ja": "交渉人",
+        "ko": "교섭인",
+        "zh-CN": "交涉人",
+        "zh-Hant": "交涉人"
+      },
+      "elements": [],
+      "human": true,
+      "icon": "Male_Angler01_v01"
     },
     {
       "code": "Ninja_Bowgun",

@@ -34,7 +34,7 @@ export type DpsSlot = { SaveParameter: { value: Props }; InstanceId?: Prop };
 export type ExtractInput = {
   meta: { name: string | null; inGameDay: number | null };
   characters: CharacterEntry[];
-  /** How many warnings the parser left (`level.warnings.length`). */
+  /** Warnings that may affect the list: parser warnings in the character table ({@link relevantLevelWarnings}) plus files that failed to read. */
   warnings: number;
   /** Each player file's `SaveData`, keyed by player ID in the {@link uidOf} form. */
   playerFiles: Map<string, Props>;
@@ -64,6 +64,22 @@ function num(prop: Prop, fallback: number): number {
  */
 export function uidOf(text: string): string {
   return text.toLowerCase();
+}
+
+/**
+ * How many of `Level.sav`'s parser warnings matter to the viewer.
+ *
+ * When the vendor parser meets a structure missing from its type table it guesses the
+ * default type and records a warning. Palworld 1.0 worlds have plenty of these, but they sit
+ * in enemy-camp treasure boxes, locks and recovery points, none of which the viewer reads (a
+ * six-player world had 57, none under the character table). Reporting all of them would make
+ * almost every 1.0 save say "some values may be incomplete" while the list is complete. So
+ * only warnings under the character table count; the caller adds failed player and storage
+ * files separately.
+ */
+export function relevantLevelWarnings(warnings: readonly unknown[]): number {
+  return warnings.filter((w) => String(w).includes(".worldSaveData.CharacterSaveParameterMap."))
+    .length;
 }
 
 function guidOf(prop: Prop): string | null {

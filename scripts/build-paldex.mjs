@@ -133,18 +133,16 @@ function localized(i18n, field) {
 }
 
 /**
- * Names upstream uses as placeholders: `en Text`, `de_Text`, `-`, `Unidentified Pal`, or
- * just the internal name.
+ * Names upstream uses as placeholders: `en Text`, `de_Text`, `-`, `Unidentified Pal`.
  *
  * Only the two tables the save viewer adds (skills, characters) use this. The Paldex and
  * passives keep `localized`'s "fall back to English", so their output stays byte-identical
  * to before (`--check`).
  */
-function isPlaceholder(name, code) {
+function isPlaceholder(name) {
   const s = String(name ?? "").trim();
   return (
     s === "" ||
-    s === code ||
     /^-+$/.test(s) ||
     /^[a-z]{2}(-[A-Za-z]+)?[_ ]text$/i.test(s) ||
     /^unidentified pal$/i.test(s)
@@ -157,15 +155,21 @@ function isPlaceholder(name, code) {
  *
  * Dropped rather than exported with the placeholder: the viewer shows unknown codes as
  * stored, and "en Text" is harder to recognise than the code, and looks like our bug.
+ *
+ * **A name equal to the internal code is not a placeholder by itself.** `Apocalypse`,
+ * `TriSpark` and `Intimidate` have English names identical to their codes while the other
+ * languages carry real names; dropping them would show three common skills as raw codes. An
+ * entry only counts as unnamed when no language offers anything other than the code.
  */
 function realNames(i18n, code) {
-  const en = i18nField((i18n ?? {}).en, "Name");
-  if (isPlaceholder(en, code)) return null;
+  const raw = Object.fromEntries(
+    Object.entries(LOCALES).map(([ours, theirs]) => [ours, i18nField((i18n ?? {})[theirs], "Name")]),
+  );
+  const named = (v) => !isPlaceholder(v) && String(v).trim() !== code;
+  const en = raw.en;
+  if (isPlaceholder(en) || !Object.values(raw).some(named)) return null;
   const out = {};
-  for (const [ours, theirs] of Object.entries(LOCALES)) {
-    const v = i18nField((i18n ?? {})[theirs], "Name");
-    out[ours] = isPlaceholder(v, code) ? en : v;
-  }
+  for (const ours of Object.keys(LOCALES)) out[ours] = isPlaceholder(raw[ours]) ? en : raw[ours];
   return out;
 }
 

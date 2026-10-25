@@ -19,7 +19,7 @@ import { fileURLToPath } from "node:url";
 import { VERIFIED_TYPE_HINTS } from "../src/core/type-hints.ts";
 import { CHARACTERS, ELEMENTS, LOCALES, PALS, PASSIVES, UPSTREAM_COMMIT as PALDEX_COMMIT, WAZA } from "../src/dex/index.ts";
 import { PALWORLD_TYPE_HINTS } from "../src/vendor/gvas.js";
-import { extractWorld, uidOf } from "../src/viewer/extract.ts";
+import { extractWorld, relevantLevelWarnings, uidOf } from "../src/viewer/extract.ts";
 import { hasCharacters } from "../src/viewer/scan.ts";
 import { gunzip, isGzip, isTar, readTar } from "../src/viewer/tar.ts";
 
@@ -269,6 +269,19 @@ function tarBlock(name, type, data = new Uint8Array(0)) {
     "a storage Pal without an owner should belong to the player the file is named after",
   );
   expect(byKey.get("Kitsunebi")?.gender === null, "EPalGenderType::None should read as no gender");
+
+  // Only warnings under the character table count: in 1.0 worlds, warnings from structures
+  // like enemy-camp treasure boxes have nothing to do with the list, and counting them would
+  // flag every save as "possibly incomplete". The wording follows the vendor's gvas.js.
+  const warn = (path) => `Struct type for ${path} not found, assuming StructProperty`;
+  expect(
+    relevantLevelWarnings([
+      warn(".worldSaveData.EnemyCampSaveData.EnemyCampStatusMap.Value.TreasureBoxInfoMapBySpawnerName.Value"),
+      warn(".worldSaveData.LockGimmickSaveData.Value"),
+      warn(".worldSaveData.CharacterSaveParameterMap.Value.RawData.SaveParameter.Unknown"),
+    ]) === 1,
+    "only parser warnings under the character table should count",
+  );
 }
 
 // ---- The entries we add to the vendor type table ----
@@ -304,7 +317,7 @@ function tarBlock(name, type, data = new Uint8Array(0)) {
   // matching, the count jumps to 0 or doubles, while the page only gets shorter or longer.
   if (PALS.length < 250 || PALS.length > 400) report(where, `${PALS.length} Pals is outside the expected range (297 at export)`);
   if (PASSIVES.length < 100 || PASSIVES.length > 200) report(where, `${PASSIVES.length} passives is outside the expected range (115 at export)`);
-  if (WAZA.length < 300 || WAZA.length > 500) report(where, `${WAZA.length} skills is outside the expected range (377 at export)`);
+  if (WAZA.length < 300 || WAZA.length > 500) report(where, `${WAZA.length} skills is outside the expected range (380 at export)`);
   if (ELEMENTS.length !== 9) report(where, `there should be 9 elements, there are ${ELEMENTS.length}`);
 
   const codes = new Set(PALS.map((p) => p.code));
